@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Support Playground</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root { --grad: linear-gradient(135deg, #7c3aed 0%, #4f46e5 50%, #0891b2 100%); --ink: #0f172a; --muted: #64748b; --line: #e2e8f0; --bg: #f4f6fb; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--ink); height: 100vh; display: flex; flex-direction: column; }
+        button { font-family: inherit; cursor: pointer; }
+        .topbar { display: flex; align-items: center; gap: .8rem; padding: .8rem 1.4rem; background: #fff; border-bottom: 1px solid var(--line); }
+        .logo { width: 38px; height: 38px; border-radius: 11px; background: var(--grad); color: #fff; display: grid; place-items: center; font-size: 1.2rem; }
+        .brand { font-weight: 800; font-size: 1.15rem; }
+        .brand span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .pill { font-size: .75rem; font-weight: 600; padding: .3rem .7rem; border-radius: 30px; background: #ede9fe; color: #6d28d9; }
+        .spacer { flex: 1; }
+        .link-btn { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: .45rem .9rem; font-weight: 600; color: var(--ink); text-decoration: none; font-size: .85rem; }
+        .link-btn:hover { border-color: #a5b4fc; color: #4f46e5; }
+        .btn { border: 0; border-radius: 12px; padding: .65rem 1.1rem; font-weight: 600; font-size: .9rem; }
+        .btn-primary { background: var(--grad); color: #fff; box-shadow: 0 8px 20px rgba(79, 70, 229, .3); }
+        .btn-primary:disabled { opacity: .6; }
+        .btn-light { background: #f1f5f9; color: var(--ink); }
+        .btn-danger { background: #fee2e2; color: #b91c1c; }
+
+        /* Login */
+        .login-wrap { flex: 1; display: grid; place-items: center; padding: 2rem; }
+        .login-card { width: 100%; max-width: 430px; background: #fff; border-radius: 22px; padding: 2.4rem; box-shadow: 0 25px 60px rgba(79, 70, 229, .12); text-align: center; }
+        .login-card h2 { margin: .8rem 0 .3rem; }
+        .login-card p { color: var(--muted); margin: 0 0 1.4rem; }
+        .field { width: 100%; padding: .75rem 1rem; border: 1px solid var(--line); border-radius: 12px; margin-bottom: .8rem; font-size: .95rem; font-family: inherit; }
+        .field:focus { outline: none; border-color: #a5b4fc; box-shadow: 0 0 0 3px rgba(79, 70, 229, .12); }
+        .demo { display: flex; gap: .4rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+        .demo button { border: 1px solid var(--line); background: #f8fafc; border-radius: 30px; padding: .35rem .8rem; font-size: .8rem; font-weight: 600; }
+        .err { color: #b91c1c; font-size: .85rem; min-height: 1.2rem; margin-top: .5rem; }
+
+        /* App */
+        .app { flex: 1; display: grid; grid-template-columns: 330px 1fr; min-height: 0; }
+        .side { background: #fff; border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+        .side-head { padding: 1rem; display: flex; gap: .5rem; align-items: center; border-bottom: 1px solid var(--line); }
+        .side-head h4 { margin: 0; flex: 1; font-size: .95rem; }
+        .list { overflow-y: auto; flex: 1; }
+        .item { padding: .85rem 1rem; border-bottom: 1px solid #f1f5f9; cursor: pointer; }
+        .item:hover { background: #fafbff; }
+        .item.active { background: #f5f3ff; border-left: 3px solid #7c3aed; }
+        .item .t { font-weight: 600; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item .s { font-size: .78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: .15rem; }
+        .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; padding: .8rem 1rem; border-bottom: 1px solid var(--line); }
+        .kpi { background: #f8fafc; border-radius: 12px; padding: .6rem .7rem; }
+        .kpi b { display: block; font-size: 1.15rem; }
+        .kpi span { font-size: .72rem; color: var(--muted); font-weight: 600; }
+
+        .chat { display: flex; flex-direction: column; min-height: 0; }
+        .chat-head { padding: .9rem 1.3rem; background: #fff; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
+        .chat-head h3 { margin: 0; font-size: 1rem; flex: 1; }
+        .messages { flex: 1; overflow-y: auto; padding: 1.3rem; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 22px 22px; }
+        .empty { height: 100%; display: grid; place-items: center; text-align: center; color: var(--muted); }
+        .empty i { font-size: 2.6rem; color: #7c3aed; }
+        .suggest { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
+        .suggest button { border: 1px solid #ddd6fe; background: #fff; border-radius: 30px; padding: .45rem .9rem; font-size: .82rem; color: #5b21b6; font-weight: 600; }
+        .msg { display: flex; flex-direction: column; max-width: 74%; margin-bottom: 1rem; animation: in .25s ease; }
+        .msg.me { margin-left: auto; align-items: flex-end; }
+        @keyframes in { from { opacity: 0; transform: translateY(6px); } }
+        .who { font-size: .72rem; color: var(--muted); margin-bottom: .25rem; display: flex; gap: .35rem; align-items: center; }
+        .tag { font-size: .62rem; font-weight: 700; text-transform: uppercase; padding: .1rem .4rem; border-radius: 6px; }
+        .tag.ai { background: #ede9fe; color: #6d28d9; } .tag.human { background: #dcfce7; color: #15803d; }
+        .bubble { padding: .75rem 1rem; border-radius: 18px; background: #fff; border: 1px solid #e9edf3; white-space: pre-wrap; line-height: 1.5; box-shadow: 0 2px 6px rgba(15, 23, 42, .04); }
+        .msg.me .bubble { background: var(--grad); color: #fff; border: 0; border-top-right-radius: 6px; }
+        .msg.ai .bubble { border-top-left-radius: 6px; }
+        .msg.agent .bubble { border: 1px solid #bbf7d0; background: #f0fdf4; }
+        .chips { display: flex; gap: .35rem; flex-wrap: wrap; margin-top: .35rem; }
+        .chip { font-size: .7rem; font-weight: 600; padding: .2rem .55rem; border-radius: 20px; background: #f1f5f9; color: #475569; }
+        .chip.Positive { background: #dcfce7; color: #15803d; } .chip.Negative { background: #ffedd5; color: #c2410c; } .chip.Angry { background: #fee2e2; color: #b91c1c; }
+        .sys { text-align: center; margin: .6rem 0 1rem; } .sys span { font-size: .78rem; background: #e2e8f0; color: #475569; padding: .35rem .85rem; border-radius: 30px; display: inline-block; }
+        .status { font-size: .72rem; font-weight: 700; padding: .25rem .65rem; border-radius: 20px; }
+        .status.Active { background: #e0f2fe; color: #0369a1; } .status.Escalated { background: #fee2e2; color: #b91c1c; }
+        .status.Resolved { background: #dcfce7; color: #15803d; } .status.Closed { background: #f1f5f9; color: #475569; }
+        .status.Pending { background: #fef3c7; color: #b45309; } .status.Assigned { background: #ede9fe; color: #6d28d9; }
+        .prio-Urgent { color: #b91c1c; font-weight: 700; } .prio-High { color: #c2410c; font-weight: 700; }
+        .composer { padding: .9rem 1.2rem; background: #fff; border-top: 1px solid var(--line); display: flex; gap: .6rem; align-items: flex-end; }
+        .composer textarea { flex: 1; resize: none; border: 1px solid var(--line); border-radius: 14px; padding: .75rem 1rem; font-family: inherit; font-size: .95rem; max-height: 140px; }
+        .composer textarea:focus { outline: none; border-color: #a5b4fc; }
+        .notice { padding: .6rem 1.2rem; background: #fffbeb; color: #92400e; font-size: .85rem; font-weight: 600; border-top: 1px solid #fde68a; }
+        .typing { padding: 0 1.3rem .6rem; color: var(--muted); font-size: .82rem; }
+        .stars button { border: 0; background: none; font-size: 1.4rem; color: #cbd5e1; padding: 0 .1rem; }
+        .stars button.on { color: #f59e0b; }
+        .hidden { display: none !important; }
+        @media (max-width: 860px) { .app { grid-template-columns: 1fr; } .side { max-height: 35vh; } .msg { max-width: 92%; } }
+    </style>
+</head>
+<body>
+<div class="topbar">
+    <div class="logo"><i class="bi bi-robot"></i></div>
+    <div class="brand">AI Support <span>Playground</span></div>
+    <span class="pill" id="providerPill">AI assistant</span>
+    <div class="spacer"></div>
+    <a href="/swagger" class="link-btn"><i class="bi bi-braces"></i> Swagger API</a>
+    <span id="userBox" class="hidden" style="font-size:.85rem;font-weight:600"></span>
+    <button class="link-btn hidden" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</button>
+</div>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginView">
+    <div class="login-card">
+        <div class="logo" style="margin:auto;width:58px;height:58px;font-size:1.6rem;border-radius:17px"><i class="bi bi-robot"></i></div>
+        <h2>AI Customer Support</h2>
+        <p>Login to chat with the AI assistant or handle escalations as an agent.</p>
+        <input class="field" id="email" type="email" placeholder="Email" />
+        <input class="field" id="password" type="password" placeholder="Password" />
+        <button class="btn btn-primary" style="width:100%" id="loginBtn">Login</button>
+        <div class="err" id="loginErr"></div>
+        <div class="demo">
+            <button data-e="customer@support.ai" data-p="Customer@123"><i class="bi bi-person"></i> Customer</button>
+            <button data-e="agent@support.ai" data-p="Agent@123"><i class="bi bi-headset"></i> Agent</button>
+            <button data-e="admin@support.ai" data-p="Admin@123"><i class="bi bi-shield-check"></i> Admin</button>
+        </div>
+    </div>
+</div>
+
+<!-- APP -->
+<div class="app hidden" id="appView">
+    <aside class="side">
+        <div class="kpis hidden" id="kpis"></div>
+        <div class="side-head">
+            <h4 id="sideTitle">Conversations</h4>
+            <button class="btn btn-primary" id="newChatBtn" style="padding:.45rem .8rem"><i class="bi bi-plus-lg"></i> New chat</button>
+        </div>
+        <div class="list" id="list"></div>
+    </aside>
+
+    <section class="chat">
+        <div class="chat-head">
+            <h3 id="chatTitle">New conversation</h3>
+            <span class="status hidden" id="chatStatus"></span>
+            <button class="btn btn-light hidden" id="humanBtn"><i class="bi bi-person-raised-hand"></i> Talk to a human</button>
+            <button class="btn btn-light hidden" id="claimBtn"><i class="bi bi-hand-index-thumb"></i> Claim</button>
+            <button class="btn btn-light hidden" id="returnAiBtn"><i class="bi bi-robot"></i> Return to AI</button>
+            <button class="btn btn-danger hidden" id="resolveBtn"><i class="bi bi-check2-circle"></i> Resolve</button>
+            <button class="btn btn-danger hidden" id="closeBtn"><i class="bi bi-x-circle"></i> Close</button>
+            <span class="stars hidden" id="stars"></span>
+        </div>
+        <div class="messages" id="messages"></div>
+        <div class="typing hidden" id="typing"><i class="bi bi-three-dots"></i> Assistant is thinking…</div>
+        <div class="notice hidden" id="notice"></div>
+        <div class="composer" id="composer">
+            <textarea id="input" rows="1" placeholder="Type your message… (Enter to send)"></textarea>
+            <button class="btn btn-primary" id="sendBtn"><i class="bi bi-send-fill"></i></button>
+        </div>
+    </section>
+</div>
+
+<script>
+(() => {
+    const $ = id => document.getElementById(id);
+    const esc = t => { const d = document.createElement("div"); d.textContent = t ?? ""; return d.innerHTML; };
+    const store = { get: k => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch { } } };
+
+    let token = store.get("ai_token");
+    let me = JSON.parse(store.get("ai_user") || "null");
+    let current = null;          // current conversation detail
+    let currentEscalation = null; // staff: selected escalation
+    let poll = null;
+
+    async function api(path, opts = {}) {
+        const res = await fetch(path, {
+            ...opts,
+            headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+        });
+        if (res.status === 204) return null;
+        const body = await res.json().catch(() => ({}));
+        if (res.status === 401) { logout(); throw new Error("Session expired. Please login again."); }
+        if (!res.ok) {
+            const details = body.errors ? " " + Object.values(body.errors).flat().join(" ") : "";
+            throw new Error((body.message || `Request failed (${res.status})`) + details);
+        }
+        return body.data;
+    }
+
+    const isStaff = () => me && (me.role === "Agent" || me.role === "Admin");
+    const time = iso => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const show = (el, on) => el.classList.toggle("hidden", !on);
+
+    // ---------------- Auth ----------------
+    document.querySelectorAll(".demo button").forEach(b => b.onclick = () => { $("email").value = b.dataset.e; $("password").value = b.dataset.p; });
+    $("loginBtn").onclick = async () => {
+        $("loginErr").textContent = "";
+        try {
+            const data = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ email: $("email").value, password: $("password").value }) });
+            token = data.token; me = data.user;
+            store.set("ai_token", token); store.set("ai_user", JSON.stringify(me));
+            start();
+        } catch (e) { $("loginErr").textContent = e.message; }
+    };
+    $("password").addEventListener("keydown", e => { if (e.key === "Enter") $("loginBtn").click(); });
+
+    function logout() {
+        token = null; me = null; store.set("ai_token", null); store.set("ai_user", null);
+        clearInterval(poll);
+        show($("appView"), false); show($("loginView"), true); show($("userBox"), false); show($("logoutBtn"), false);
+    }
+    $("logoutBtn").onclick = logout;
+
+    function start() {
+        show($("loginView"), false); show($("appView"), true);
+        $("userBox").textContent = `${me.fullName} · ${me.role}`;
+        show($("userBox"), true); show($("logoutBtn"), true);
+        show($("newChatBtn"), !isStaff());
+        $("sideTitle").textContent = isStaff() ? "Escalation queue" : "My conversations";
+        resetChat();
+        loadSide();
+        if (me.role === "Admin") loadKpis();
+        clearInterval(poll);
+        poll = setInterval(refresh, 4000);
+    }
+
+    // ---------------- Sidebar ----------------
+    async function loadSide() {
+        try {
+            if (isStaff()) {
+                const page = await api("/api/agent/escalations?pageSize=50");
+                const items = page.items.filter(e => e.status !== "Resolved");
+                $("list").innerHTML = items.length ? items.map(e => `
+                    <div class="item ${currentEscalation && currentEscalation.id === e.id ? "active" : ""}" data-esc='${e.id}' data-conv='${e.conversationId}'>
+                        <div class="t">${esc(e.conversationTitle)}</div>
+                        <div class="s"><span class="status ${e.status}">${e.status}</span> <span class="prio-${e.priority}">${e.priority}</span> · ${esc(e.customerName)} · ${e.waitingMinutes} min</div>
+                        <div class="s">${esc(e.reason)}</div>
+                    </div>`).join("") : `<div class="item"><div class="s">🎉 No open escalations</div></div>`;
+                $("list").querySelectorAll("[data-esc]").forEach(el => el.onclick = () => {
+                    currentEscalation = items.find(x => x.id == el.dataset.esc);
+                    openConversation(+el.dataset.conv);
+                });
+            } else {
+                const page = await api("/api/conversations?pageSize=50");
+                $("list").innerHTML = page.items.length ? page.items.map(c => `
+                    <div class="item ${current && current.id === c.id ? "active" : ""}" data-id="${c.id}">
+                        <div class="t">${esc(c.title)}</div>
+                        <div class="s"><span class="status ${c.status}">${c.status}</span> ${c.currentIntent ? "· " + c.currentIntent : ""}</div>
+                        <div class="s">${esc(c.lastMessagePreview || "")}</div>
+                    </div>`).join("") : `<div class="item"><div class="s">No conversations yet – say hi! 👋</div></div>`;
+                $("list").querySelectorAll("[data-id]").forEach(el => el.onclick = () => openConversation(+el.dataset.id));
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadKpis() {
+        try {
+            const d = await api("/api/admin/dashboard");
+            $("providerPill").textContent = "AI: " + d.aiProvider;
+            $("kpis").innerHTML = [
+                ["Conversations", d.totalConversations], ["Open escalations", d.openEscalations],
+                ["AI resolution", d.aiResolutionRate + "%"], ["Avg rating", d.averageRating ?? "–"]
+            ].map(([l, v]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
+            show($("kpis"), true);
+        } catch (e) { console.error(e); }
+    }
+
+    // ---------------- Chat ----------------
+    function resetChat() {
+        current = null; currentEscalation = null;
+        $("chatTitle").textContent = isStaff() ? "Select an escalation" : "New conversation";
+        show($("chatStatus"), false);
+        ["humanBtn", "claimBtn", "returnAiBtn", "resolveBtn", "closeBtn", "stars", "notice"].forEach(id => show($(id), false));
+        show($("composer"), !isStaff());
+        $("messages").innerHTML = isStaff()
+            ? `<div class="empty"><div><i class="bi bi-headset"></i><h3>Escalation queue</h3><p>Pick a conversation on the left to help the customer.</p></div></div>`
+            : `<div class="empty"><div><i class="bi bi-robot"></i><h3>Hi! I'm Aria, your AI assistant 👋</h3><p>Ask me anything about orders, delivery, refunds or your account.</p>
+                <div class="suggest">${["Where is my order?", "How long does a refund take?", "Can I pay with JazzCash?", "My parcel arrived damaged, this is unacceptable!!", "I want to talk to a human"]
+                    .map(s => `<button>${s}</button>`).join("")}</div></div></div>`;
+        $("messages").querySelectorAll(".suggest button").forEach(b => b.onclick = () => { $("input").value = b.textContent; send(); });
+    }
+
+    async function openConversation(id) {
+        try {
+            const url = isStaff() ? `/api/agent/conversations/${id}` : `/api/conversations/${id}`;
+            current = await api(url);
+            renderConversation();
+            loadSide();
+        } catch (e) { alert(e.message); }
+    }
+
+    function messageHtml(m) {
+        if (m.role === "System") return `<div class="sys"><span><i class="bi bi-info-circle"></i> ${esc(m.content)}</span></div>`;
+        const mine = (!isStaff() && m.role === "User") || (isStaff() && m.role === "Agent" && m.senderName === me.fullName);
+        const cls = m.role === "Assistant" ? "ai" : m.role === "Agent" ? "agent" : "";
+        const name = m.role === "Assistant" ? `${esc(m.senderName || "Aria")} <span class="tag ai">AI</span>`
+                   : m.role === "Agent" ? `${esc(m.senderName)} <span class="tag human">Human agent</span>`
+                   : esc(mine ? "You" : m.senderName || "Customer");
+        const chips = m.intent ? `<div class="chips">
+                <span class="chip"><i class="bi bi-bullseye"></i> ${m.intent}</span>
+                <span class="chip ${m.sentiment}">${m.sentiment}</span>
+                ${m.confidence != null ? `<span class="chip">${Math.round(m.confidence * 100)}% confident</span>` : ""}</div>` : "";
+        return `<div class="msg ${mine ? "me" : ""} ${cls}"><div class="who">${name} · ${time(m.createdAt)}</div><div class="bubble">${esc(m.content)}</div>${(isStaff() || m.role === "Assistant") ? chips : ""}</div>`;
+    }
+
+    function renderConversation() {
+        const c = current;
+        $("chatTitle").textContent = c.title;
+        $("chatStatus").textContent = c.status; $("chatStatus").className = `status ${c.status}`; show($("chatStatus"), true);
+        $("messages").innerHTML = c.messages.map(messageHtml).join("");
+        $("messages").scrollTop = $("messages").scrollHeight;
+
+        const open = c.status === "Active" || c.status === "Escalated";
+        if (isStaff()) {
+            const openEsc = c.escalations.filter(e => e.status !== "Resolved").pop();
+            currentEscalation = openEsc ? { ...currentEscalation, id: openEsc.id } : null;
+            show($("claimBtn"), !!openEsc && openEsc.assignedAgentName !== me.fullName);
+            show($("returnAiBtn"), !!openEsc); show($("resolveBtn"), !!openEsc);
+            show($("composer"), c.status === "Escalated");
+            show($("notice"), c.status === "Active");
+            $("notice").textContent = "The AI assistant is handling this conversation.";
+        } else {
+            show($("humanBtn"), c.status === "Active");
+            show($("closeBtn"), open);
+            show($("composer"), open);
+            show($("notice"), c.status === "Escalated");
+            $("notice").innerHTML = `<i class="bi bi-person-check"></i> A human agent${c.assignedAgentName ? " (" + esc(c.assignedAgentName) + ")" : ""} is handling this conversation and will reply here.`;
+            renderStars(!open);
+        }
+    }
+
+    function renderStars(on) {
+        show($("stars"), on);
+        if (!on) return;
+        $("stars").innerHTML = "Rate: " + [1, 2, 3, 4, 5].map(i => `<button data-r="${i}" class="${current.rating >= i ? "on" : ""}">★</button>`).join("");
+        $("stars").querySelectorAll("button").forEach(b => b.onclick = async () => {
+            current = await api(`/api/conversations/${current.id}/feedback`, { method: "POST", body: JSON.stringify({ rating: +b.dataset.r }) });
+            renderConversation();
+        });
+    }
+
+    async function send() {
+        const text = $("input").value.trim();
+        if (!text) return;
+        $("input").value = ""; $("sendBtn").disabled = true;
+
+        try {
+            if (isStaff()) {
+                await api(`/api/agent/conversations/${current.id}/reply`, { method: "POST", body: JSON.stringify({ content: text }) });
+                await openConversation(current.id);
+            } else {
+                if (!current) $("messages").innerHTML = "";
+                $("messages").insertAdjacentHTML("beforeend", messageHtml({ role: "User", content: text, createdAt: new Date().toISOString() }));
+                $("messages").scrollTop = $("messages").scrollHeight;
+                show($("typing"), true);
+                const res = await api("/api/chat", { method: "POST", body: JSON.stringify({ conversationId: current?.id ?? null, message: text }) });
+                if (res.analysis) $("providerPill").textContent = `AI: ${res.analysis.provider} · ${res.analysis.latencyMs} ms`;
+                await openConversation(res.conversationId);
+            }
+        } catch (e) {
+            alert(e.message);
+        } finally {
+            show($("typing"), false); $("sendBtn").disabled = false; $("input").focus();
+        }
+    }
+
+    $("sendBtn").onclick = send;
+    $("input").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+    $("newChatBtn").onclick = () => { resetChat(); loadSide(); };
+
+    $("humanBtn").onclick = async () => { current = await api(`/api/conversations/${current.id}/escalate`, { method: "POST", body: JSON.stringify({}) }); renderConversation(); loadSide(); };
+    $("closeBtn").onclick = async () => { if (!confirm("Close this conversation?")) return; current = await api(`/api/conversations/${current.id}/close`, { method: "POST" }); renderConversation(); loadSide(); };
+    $("claimBtn").onclick = async () => { await api(`/api/agent/escalations/${currentEscalation.id}/claim`, { method: "POST" }); openConversation(current.id); };
+    $("resolveBtn").onclick = async () => { await api(`/api/agent/escalations/${currentEscalation.id}/resolve`, { method: "POST", body: JSON.stringify({ note: "Resolved by agent", returnToAi: false }) }); openConversation(current.id); };
+    $("returnAiBtn").onclick = async () => { await api(`/api/agent/escalations/${currentEscalation.id}/resolve`, { method: "POST", body: JSON.stringify({ note: "Handed back to AI", returnToAi: true }) }); openConversation(current.id); };
+
+    // Poll for human-agent replies / new escalations
+    async function refresh() {
+        if (!token) return;
+        if (current && (isStaff() || current.status === "Escalated")) {
+            const before = current.messages.length;
+            try {
+                const latest = await api(isStaff() ? `/api/agent/conversations/${current.id}` : `/api/conversations/${current.id}`);
+                if (latest.messages.length !== before || latest.status !== current.status) { current = latest; renderConversation(); }
+            } catch { }
+        }
+        if (isStaff()) loadSide();
+        if (me && me.role === "Admin") loadKpis();
+    }
+
+    if (token && me) start();
+})();
+</script>
+</body>
+</html>

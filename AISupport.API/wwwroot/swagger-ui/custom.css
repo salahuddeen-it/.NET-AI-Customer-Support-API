@@ -1,0 +1,131 @@
+/* ===== AI Support – Swagger UI theme ===== */
+body {
+    background: #f4f6fb;
+}
+
+.swagger-ui {
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Top bar */
+.swagger-ui .topbar {
+    background: linear-gradient(90deg, #7c3aed 0%, #0891b2 100%);
+    padding: 14px 0;
+    box-shadow: 0 2px 12px rgba(30, 58, 138, .25);
+}
+
+.swagger-ui .topbar-wrapper .link img,
+.swagger-ui .topbar-wrapper .link svg {
+    display: none;
+}
+
+.swagger-ui .topbar-wrapper .link::after {
+    content: "🤖 AI Support API";
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: .4px;
+}
+
+.swagger-ui .topbar .download-url-wrapper .select-label {
+    color: #e0e7ff;
+}
+
+/* Info card */
+.swagger-ui .info {
+    background: #fff;
+    border-radius: 14px;
+    padding: 26px 30px;
+    margin: 30px 0 20px;
+    box-shadow: 0 4px 20px rgba(30, 58, 138, .08);
+    border-left: 5px solid #4f46e5;
+}
+
+.swagger-ui .info .title {
+    color: #1e3a8a;
+    font-weight: 800;
+}
+
+.swagger-ui .info table {
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.swagger-ui .info table th,
+.swagger-ui .info table td {
+    padding: 6px 16px;
+    border: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.swagger-ui .info table th {
+    background: #eef2ff;
+    color: #3730a3;
+}
+
+/* Authorize area */
+.swagger-ui .scheme-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
+    margin: 0 0 20px;
+}
+
+.swagger-ui .btn.authorize {
+    border: 2px solid #16a34a;
+    color: #16a34a;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.swagger-ui .btn.authorize svg {
+    fill: #16a34a;
+}
+
+/* Groups */
+.swagger-ui .opblock-tag {
+    font-size: 21px;
+    color: #1e293b;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 12px 6px;
+}
+
+.swagger-ui .opblock-tag small {
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* Endpoints */
+.swagger-ui .opblock {
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
+    overflow: hidden;
+}
+
+.swagger-ui .opblock .opblock-summary-method {
+    border-radius: 6px;
+    min-width: 76px;
+    font-weight: 700;
+}
+
+.swagger-ui .opblock .opblock-summary-description {
+    color: #334155;
+    font-weight: 500;
+}
+
+.swagger-ui .btn.execute {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    border-radius: 8px;
+}
+
+.swagger-ui .btn.execute:hover {
+    background: #4338ca;
+}
+
+.swagger-ui .filter-container .operation-filter-input {
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    padding: 8px 12px;
+}
